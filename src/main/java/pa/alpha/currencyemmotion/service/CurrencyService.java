@@ -30,7 +30,7 @@ public class CurrencyService {
 
         String cRate = courseInfo.getRates().get(currencyCode);
         String lRate = laterCourseInfo.getRates().get(currencyCode);
-        String targetUrl = "";
+
         CourseDirection courseDirection = CourseDirection.RISE;
         if(cRate!=null && lRate!=null) {
             Double currentRate = Double.valueOf(cRate);
@@ -38,7 +38,6 @@ public class CurrencyService {
             if(currentRate>laterRate){
                 courseDirection = CourseDirection.FALL;
             }
-
         }
 
         return courseDirection;
