@@ -35,7 +35,7 @@ class CurrencyServiseTest {
 
 
     @Test
-    void getCourseDirection(){
+    void getCourseDirectionTest(){
 
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String laterDatePresent = dateFormatter.format(LocalDateTime.now().minusDays(1));

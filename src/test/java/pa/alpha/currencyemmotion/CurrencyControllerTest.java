@@ -5,11 +5,12 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 import pa.alpha.currencyemmotion.controller.CurrencyController;
 import pa.alpha.currencyemmotion.controller.CurrencyFeignClient;
+import pa.alpha.currencyemmotion.controller.GiphyFeignClient;
 import pa.alpha.currencyemmotion.dto.CourseInfoDto;
+import pa.alpha.currencyemmotion.dto.GiphyDataDto;
 import pa.alpha.currencyemmotion.service.CurrencyService;
 
 import java.time.LocalDateTime;
@@ -18,10 +19,13 @@ import java.time.format.DateTimeFormatter;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-public class CurrencyControllerTest {
+class CurrencyControllerTest {
 
     @MockBean
     public CurrencyFeignClient currencyFeignClient;
+    @MockBean
+    public GiphyFeignClient giphyFeignClient;
+
 
     @Autowired
     public CurrencyOptions currencyOptions;
@@ -29,7 +33,24 @@ public class CurrencyControllerTest {
     public CurrencyController currencyController;
 
     @Test
-    public void getDirectionTest(){
+    void getDirectionTest(){
+
+        /*  Prepare  @MockBean GiphyFeignClient  */
+        GiphyDataDto brokeEmotion = new GiphyDataDto();
+        brokeEmotion.setData(brokeEmotion.new DataSection("broke"));
+
+        GiphyDataDto richEmotion = new GiphyDataDto();
+        richEmotion.setData(richEmotion.new DataSection("rich"));
+
+        Mockito.when(giphyFeignClient.getRisingGif(
+                currencyOptions.getGiphyApiKey()
+        )).thenReturn(richEmotion);
+
+        Mockito.when(giphyFeignClient.getFallingGif(
+                currencyOptions.getGiphyApiKey()
+        )).thenReturn(brokeEmotion);
+
+        /*  Prepare  @MockBean CurrencyFeignClient  */
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String laterDatePresent = dateFormatter.format(LocalDateTime.now().minusDays(1));
 
@@ -55,7 +76,7 @@ public class CurrencyControllerTest {
         )).thenReturn(lessCourse);
 
         assertEquals(CurrencyService.CourseDirection.RISE, currencyController.getDirection("RUB"));
-        ModelAndView img1 = currencyController.getEmotion("RUB");
+        ModelAndView imgRich = currencyController.getEmotion("RUB");
 
         Mockito.when(currencyFeignClient.getHistoryCourse(
                 currencyOptions.getCurrencyApiKey(),
@@ -69,11 +90,10 @@ public class CurrencyControllerTest {
         )).thenReturn(graterCourse);
 
         assertEquals(CurrencyService.CourseDirection.FALL, currencyController.getDirection("RUB"));
-        ModelAndView img2 = currencyController.getEmotion("RUB");
+        ModelAndView imgBroke = currencyController.getEmotion("RUB");
 
-        assertNotEquals(img1.getViewName(), img2.getViewName());
-        assertTrue(!img1.getViewName().isEmpty());
-        assertTrue(!img2.getViewName().isEmpty());
+        assertEquals("redirect:rich", imgRich.getViewName());
+        assertEquals("redirect:broke", imgBroke.getViewName());
 
     }
 
