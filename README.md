@@ -16,7 +16,8 @@ The base currency is USD. The exchange rate of the selected currency in relation
 3. Run the command "./gradlew clean build"
 4. Run the command "docker build -t currency-emotion ."
 5. Run the command "docker run --name=currency-emotions -d -p 8080:8080 -t currency-emotion ."
-6. For stop service run the command "docker stop currency-emotions"
+6. The application runs on port 8080. The URL of the application on localhost - http://localhost:8080/currency-emotions/
+7. For stop service run the command "docker stop currency-emotions"
 
 ### Some details
 
